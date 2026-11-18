@@ -1,2 +1,0 @@
-# stiptv
-tv por ip
