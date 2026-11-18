@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pagamento — STIPTV</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#060711">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20261116b">
+</head>
+<body class="pagina-status">
+  <div class="aviso-preview" id="aviso-preview" hidden>
+    <strong>Prévia do arquivo</strong>
+    <span>para navegar entre as páginas, copie e abra no navegador:</span>
+    <span class="aviso-preview__url" id="aviso-preview-link">http://localhost:3000/pagamento.html</span>
+  </div>
+  <header class="topo topo--simples is-scrolled">
+    <div class="container topo__inner">
+      <a class="marca" href="index.html" aria-label="STIPTV — voltar ao site">
+        <svg class="marca__mark" viewBox="0 0 40 40" width="36" height="36" aria-hidden="true">
+          <defs>
+            <linearGradient id="marcaGradPag" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#8b5cf6"/>
+              <stop offset="1" stop-color="#22d3ee"/>
+            </linearGradient>
+          </defs>
+          <rect width="40" height="40" rx="12" fill="url(#marcaGradPag)"/>
+          <path d="M16 12.5 29.5 20 16 27.5z" fill="#060711"/>
+        </svg>
+        <span class="marca__nome">STIP<em>TV</em></span>
+      </a>
+      <a class="btn btn--outline btn--sm topo__voltar" data-voltar href="index.html">Voltar ao site</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="status-card">
+      <div class="status-ico" id="status-ico" aria-hidden="true">✓</div>
+      <h1 id="status-titulo">Pagamento</h1>
+      <p id="status-texto">Carregando as informações do seu pedido…</p>
+
+      <div class="status-resumo" id="status-resumo"></div>
+
+      <div class="status-acoes">
+        <a class="btn btn--primary" id="status-whatsapp" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Enviar comprovante no WhatsApp
+        </a>
+        <a class="btn btn--outline" id="voltar-site" data-voltar href="index.html">Voltar ao site</a>
+      </div>
+
+      <p class="selo" style="justify-content:center">
+        Pagamento processado por gateway certificado. Seus dados de cartão não passam pelo nosso site.
+      </p>
+    </div>
+  </main>
+
+  <script src="js/config.js?v=20261116b"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var cfg = window.STIPTV_CONFIG || {};
+      var planos = Array.isArray(cfg.planos) ? cfg.planos : [];
+      var params = new URLSearchParams(window.location.search);
+
+      /* Uma prévia isolada (blob:/data:) não consegue abrir outras páginas.
+         Nesse caso, avisamos e indicamos o endereço correto do site. */
+      var emPrevia = window.location.protocol === 'blob:' || window.location.protocol === 'data:';
+      var avisoPrevia = document.getElementById('aviso-preview');
+
+      if (emPrevia) {
+        var urlLocal = String(cfg.urlLocal || 'http://localhost:3000').replace(/\/+$/, '');
+        var avisoLink = document.getElementById('aviso-preview-link');
+
+        if (avisoLink) {
+          avisoLink.textContent = urlLocal + '/pagamento.html';
+        }
+        if (avisoPrevia) avisoPrevia.hidden = false;
+      }
+
+      var status = String(params.get('status') || '').toLowerCase();
+      var planoId = params.get('plano') || params.get('external_reference') || '';
+      var pagamentoId = params.get('payment_id') || params.get('collection_id') || '';
+      var referencia = params.get('external_reference') || '';
+
+      if (planoId.indexOf(':') > -1) planoId = planoId.split(':')[0];
+
+      var plano = planos.filter(function (p) {
+        return p.id === planoId;
+      })[0];
+
+      var conteudo = {
+        sucesso: {
+          icone: '✓',
+          classe: '',
+          titulo: 'Pagamento aprovado!',
+          texto:
+            'Recebemos a confirmação do gateway. Envie o comprovante no WhatsApp para liberarmos seu acesso — normalmente em poucos minutos.',
+        },
+        pendente: {
+          icone: '⏳',
+          classe: 'status-ico--pendente',
+          titulo: 'Pagamento em análise',
+          texto:
+            'Assim que o gateway confirmar o pagamento (PIX e boleto podem levar alguns minutos), liberamos seu acesso. Se preferir adiantar, envie o comprovante no WhatsApp.',
+        },
+        falha: {
+          icone: '✕',
+          classe: 'status-ico--falha',
+          titulo: 'Pagamento não concluído',
+          texto:
+            'Não conseguimos confirmar o pagamento. Você pode tentar novamente pelo site ou finalizar a compra com a nossa equipe no WhatsApp.',
+        },
+      };
+
+      var atual = conteudo[status] || {
+        icone: 'i',
+        classe: 'status-ico--pendente',
+        titulo: 'Acompanhe seu pedido',
+        texto:
+          'Esta página mostra o resultado do seu pagamento. Se você já pagou e ainda não recebeu o acesso, fale com a gente no WhatsApp.',
+      };
+
+      document.getElementById('status-ico').textContent = atual.icone;
+      document.getElementById('status-ico').className = ('status-ico ' + atual.classe).trim();
+      document.getElementById('status-titulo').textContent = atual.titulo;
+      document.getElementById('status-texto').textContent = atual.texto;
+      document.title = atual.titulo + ' — ' + (cfg.marca || 'STIPTV');
+
+      /* resumo do pedido */
+      var resumo = document.getElementById('status-resumo');
+      var linhas = [];
+
+      if (plano) {
+        linhas.push(['Plano', plano.nome + ' (' + plano.meses + (plano.meses === 1 ? ' mês' : ' meses') + ')']);
+        linhas.push([
+          'Valor',
+          'R$ ' + Number(plano.preco).toFixed(2).replace('.', ','),
+        ]);
+      }
+      if (pagamentoId) linhas.push(['ID do pagamento', pagamentoId]);
+      if (referencia) linhas.push(['Referência', referencia]);
+
+      linhas.forEach(function (item) {
+        var linha = document.createElement('div');
+        var rotulo = document.createElement('span');
+        var valor = document.createElement('strong');
+        rotulo.textContent = item[0];
+        valor.textContent = item[1];
+        linha.appendChild(rotulo);
+        linha.appendChild(valor);
+        resumo.appendChild(linha);
+      });
+
+      /* WhatsApp */
+      var numero = String(cfg.whatsapp || '').replace(/\D/g, '');
+      var mensagem =
+        'Olá! Acabei de finalizar o pagamento' +
+        (plano ? ' do plano ' + plano.nome : '') +
+        (pagamentoId ? ' (ID ' + pagamentoId + ')' : '') +
+        '. Vou enviar o comprovante para liberar meu acesso.';
+
+      var link = document.getElementById('status-whatsapp');
+      if (numero) {
+        link.href = 'https://wa.me/' + numero + '?text=' + encodeURIComponent(mensagem);
+      } else {
+        link.hidden = true;
+      }
+
+      /* Reforço no retorno ao site: navega explicitamente pelo JS,
+         para funcionar também quando o clique é capturado por um
+         preview/iframe que bloqueia o link padrão. */
+      document.querySelectorAll('[data-voltar]').forEach(function (botao) {
+        botao.addEventListener('click', function (evento) {
+          if (evento.metaKey || evento.ctrlKey || evento.shiftKey) return;
+          evento.preventDefault();
+
+          if (emPrevia) {
+            if (avisoPrevia) {
+              avisoPrevia.hidden = false;
+              avisoPrevia.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            return;
+          }
+
+          window.location.assign(botao.getAttribute('href') || 'index.html');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
